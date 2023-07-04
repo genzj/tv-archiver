@@ -1,4 +1,4 @@
-settings:
+path:
   source: /path/to/source
   destination: /path/to/destination
 
@@ -6,20 +6,29 @@ settings:
   # with be move to this folder under a subfolder named with timestamp
   failed: /path/to/failed
 
-  # if true, when season patterns cannot capture any valid season number, use
-  # the last season in the archive path;
-  # if false, abort if no season pattern matches
-  # this setting can be overridden from individual movie setting
-  infer_season: true
-  # if true, when episode patterns cannot capture any valid episode number, use
-  # the last existing episode+1
-  # if false, abort if no episode pattern matches
-  # this setting can be overridden from individual movie setting
-  infer_episode: true
-
+  # expected extensions of input files
   extensions:
     - mp4
     - mkv
+
+season_parser:
+  - type: regex
+    patterns:
+      - '[Ss](?P<season>\d\d)\D'
+
+  # infer parser: when season patterns cannot capture any valid season number, use
+  # the latest season in the archive path;
+  - type: infer
+
+episode_parser:
+  - type: regex
+    patterns:
+      - '[Ee](?P<episode>\d\d)\D'
+      - '(?P<episode>\d{1,2})\D'
+
+  # infer parser: when episode patterns cannot capture any valid episode number, use
+  # the last existing episode+1
+  - infer_episode: true
 
 movies:
   # shortcut format
@@ -29,11 +38,17 @@ movies:
 
   # full format
   movie-id-2: &movie-id-2
-    # override archive path to make it {destination}/{folder}
-    folder: path/to/archive-2
     # when name is null or empty string, source file won't be renamed;
     # or the file will be renamed as normal
     name: name-2
+    # override archive path to make it {destination}/{folder}
+    folder: path/to/archive-2
+
+    # any global settings can be overriden for individual movies
+    episode_parser:
+      - type: regex
+        patterns:
+          - '\((?P<episode>\d{2})\)'
 
   # shortcut format with alias anchor
   movie-id-3: &movie-id-3 name-3
@@ -42,9 +57,3 @@ movies:
 
   movie-id-3-alias: *movie-id-3
 
-patterns:
-  season:
-    - '[Ss](?P<season>\d\d)\D'
-  episode:
-    - '[Ee](?P<episode>\d\d)\D'
-    - '(?P<episode>\d{1,2})\D'
