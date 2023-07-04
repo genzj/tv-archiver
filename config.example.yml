@@ -1,0 +1,50 @@
+settings:
+  source: /path/to/source
+  destination: /path/to/destination
+
+  # when failed is non-null and non-empty, files failed to be renamed/moved
+  # with be move to this folder under a subfolder named with timestamp
+  failed: /path/to/failed
+
+  # if true, when season patterns cannot capture any valid season number, use
+  # the last season in the archive path;
+  # if false, abort if no season pattern matches
+  # this setting can be overridden from individual movie setting
+  infer_season: true
+  # if true, when episode patterns cannot capture any valid episode number, use
+  # the last existing episode+1
+  # if false, abort if no episode pattern matches
+  # this setting can be overridden from individual movie setting
+  infer_episode: true
+
+  extensions:
+    - mp4
+    - mkv
+
+movies:
+  # shortcut format
+  # archive path will be "{destination}/{name}/Season {season}"
+  # source file will be renamed to "{name} S{season}E{episode}"
+  movie-id-1: name-1
+
+  # full format
+  movie-id-2: &movie-id-2
+    # override archive path to make it {destination}/{folder}
+    folder: path/to/archive-2
+    # when name is null or empty string, source file won't be renamed;
+    # or the file will be renamed as normal
+    name: name-2
+
+  # shortcut format with alias anchor
+  movie-id-3: &movie-id-3 name-3
+
+  movie-id-2-alias: *movie-id-2
+
+  movie-id-3-alias: *movie-id-3
+
+patterns:
+  season:
+    - '[Ss](?P<season>\d\d)\D'
+  episode:
+    - '[Ee](?P<episode>\d\d)\D'
+    - '(?P<episode>\d{1,2})\D'
