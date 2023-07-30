@@ -86,7 +86,7 @@ candidates:
 
 Use Regex to extract information from `original_path` and assign the output to
 target metadata items. Target metadata items are specified by named capture
-groups.
+groups. Matched content will be converted to proper data type before being assigned to the metadata field. File will be skipped from following processes (including actor executions) if error happens in the type conversion.
 
 Settings:
 
@@ -94,21 +94,16 @@ Settings:
     - `patterns`: `[string]` (Required)
         the Regex patterns to matched against. The first matched pattern will
         be used to extract info and following patterns will be ignored.
-    - `type`: `string`, either `string` (default) or `int`;
-        the desired data type of the extracted information, which can be useful
-        for converting the data before assigning it to metadata. This is
-        particularly handy when extracting episode or season numbers from file
-        names.
 
 E.g.:
 
 ```yaml
 expressions:
-  - type: int
-    patterns:
+  - patterns:
+      # extract digits from filename and assign it to the `season` field
       - '[Ss](?<season>\d{1,2})\D'
-  - type: int
-    patterns:
+  - patterns:
+      # extract digits from filename and assign it to the `episode` field
       - '[Ee](?<episode>\d{1,2})\D'
       - '(?<episode>\d{1,2})\D'
 ```
