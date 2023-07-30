@@ -1,3 +1,5 @@
+mod metadata;
+
 extern crate rust_fuzzy_search;
 
 use std::fs::File;
