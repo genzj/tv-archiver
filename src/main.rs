@@ -1,3 +1,4 @@
+mod source_collector;
 mod metadata;
 
 extern crate rust_fuzzy_search;
@@ -7,6 +8,8 @@ use std::println;
 
 use rust_fuzzy_search::fuzzy_search_best_n;
 use serde_yaml::Mapping;
+
+use crate::source_collector::SourceCollector;
 
 fn test() {
     let s = "[Lilith-Raws] Yuusha ga Shinda! - 11 [Baha][WEB-DL][1080p][AVC AAC][CHT][MP4]";
@@ -37,7 +40,14 @@ fn test_conf() {
     println!("{dump}");
 }
 
+fn test_glob() {
+    use crate::source_collector::glob_source_collector::GlobSourceCollector;
+    let g = GlobSourceCollector::new(vec!["**/*.rs".to_string()]);
+    println!("globed: {:?}", g.collect(&"./src".to_string()));
+}
+
 fn main() {
     test();
     test_conf();
+    test_glob();
 }

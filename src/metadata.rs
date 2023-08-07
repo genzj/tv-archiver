@@ -1,5 +1,5 @@
 /// Enum representing possible values: `SKIP` or `ABORT`.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ViolationAction {
     /// Represents the value `SKIP`.
     SKIP,
@@ -8,58 +8,58 @@ pub enum ViolationAction {
 }
 
 /// Represents a violation with information about the violated rule and the action taken.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Violation {
     /// The violated rule.
-    rule: String,
+    pub rule: String,
     /// The action taken, either "SKIP" or "ABORT".
-    action: ViolationAction,
+    pub action: ViolationAction,
 }
 
 /// Represents a file with its original and target properties.
 ///
 /// This struct contains various attributes of a file
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Metadata {
     /// The current absolute path of the file.
-    absolute_path: Option<String>,
+    pub absolute_path: Option<String>,
     /// The current file name (including the base name and extension).
     /// It may differ from `original_name` if a `Rename` executor has been applied to the file.
-    filename: Option<String>,
+    pub filename: Option<String>,
     /// The absolute path of the file when it was collected.
-    original_absolute_path: Option<String>,
+    pub original_absolute_path: Option<String>,
     /// The base name of the file when it was collected.
-    original_basename: Option<String>,
+    pub original_basename: Option<String>,
     /// The relative directory from which the file was collected.
-    original_directory: Option<String>,
+    pub original_directory: Option<String>,
     /// The extension of the file when it was collected.
-    original_extension: Option<String>,
+    pub original_extension: Option<String>,
     /// The name of the file when it was collected.
-    original_name: Option<String>,
+    pub original_name: Option<String>,
     /// The relative path of the file when it was collected.
-    original_path: Option<String>,
+    pub original_path: Option<String>,
 
     /// Absolute path of the directory where the file should be moved.
-    destination: Option<String>,
+    pub destination: Option<String>,
     /// The desired file name (including base and extension names) to which the file should be renamed.
-    next_name: Option<String>,
+    pub next_name: Option<String>,
 
     /// The show's official/designated name.
-    canonical_name: Option<String>,
+    pub canonical_name: Option<String>,
     /// The season identification number.
-    season: Option<i32>,
+    pub season: Option<i32>,
     /// The episode number within the season.
-    episode: Option<i32>,
+    pub episode: Option<i32>,
 
     /// The list of violations.
-    violations: Vec<Violation>,
+    pub violations: Vec<Violation>,
 }
 
 mod test {
-    use super::*;
-
     #[test]
     fn test_default_metadata() {
+        use super::Metadata;
+
         let metadata = Metadata::default();
         assert_eq!(metadata.violations.len(), 0);
         assert!(metadata.season.is_none());
