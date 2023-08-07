@@ -20,12 +20,7 @@ const ERR_CANNOT_CHANGE_CWD: &str = &"cannot change cwd";
 const ERR_CANNOT_RESTORE_CWD: &str = &"cannot restore cwd";
 
 fn extract_file_only(path: Result<PathBuf, GlobError>) -> Option<PathBuf> {
-    if path.is_ok() && path.as_ref().unwrap().is_file() {
-        Some(path.unwrap())
-    } else {
-        // TODO: log glob error
-        None
-    }
+    path.map_or(None, |path| if path.is_file() { Some(path) } else { None })
 }
 
 fn from_path(path: PathBuf) -> Result<Metadata, String> {
@@ -67,7 +62,7 @@ fn glob_in(pattern: &String, source: &String) -> CollectResult {
         .map_err(|e| e.to_string())?
         .filter_map(extract_file_only)
         .map(from_path)
-        .map(|m|{
+        .map(|m| {
             if m.is_ok() {
                 m
             } else {
@@ -91,5 +86,42 @@ impl SourceCollector for GlobSourceCollector {
             ans.extend(glob_in(pattern, source)?)
         }
         Ok(ans)
+    }
+}
+
+mod test {
+    mod extract_file_only {
+        #[allow(unused_imports)]
+        use glob::glob;
+        #[allow(unused_imports)]
+        use mktemp::Temp;
+        #[allow(unused_imports)]
+        use super::super::extract_file_only;
+
+        #[test]
+        fn with_file() {
+            let temp_file = Temp::new_file().unwrap();
+            assert_eq!(
+                extract_file_only(Ok(temp_file.to_path_buf())),
+                Some(temp_file.to_path_buf())
+            );
+        }
+
+        #[test]
+        fn with_dir() {
+            let temp_file = Temp::new_dir().unwrap();
+            assert_eq!(extract_file_only(Ok(temp_file.to_path_buf())), None);
+        }
+
+        // this test assumes that there is a /root directory and that
+        // the user running this test is not root or otherwise doesn't
+        // have permission to read its contents
+        #[cfg(all(unix, not(target_os = "macos")))]
+        #[test]
+        fn with_error() {
+            let mut iter = glob("/root/*").unwrap();
+            let should_be_error = iter.next().unwrap();
+            assert_eq!(extract_file_only(should_be_error), None);
+        }
     }
 }
